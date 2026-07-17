@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { RegisterUserDto } from './dto/register-user.dto';
+import { SignupUserDto } from './dto/signup-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -65,6 +66,43 @@ export class AuthService {
         throw new BadRequestException('User already exists');
       }
       this.logger.error(`POST: auth/register: error: ${JSON.stringify(error)}`);
+      throw new InternalServerErrorException('Server error');
+    }
+  }
+
+  async signupUser(dto: SignupUserDto): Promise<any> {
+    this.logger.log(`POST: auth/signup: Signup started`);
+    const email = dto.email.toLowerCase().trim();
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    try {
+      const newuser = await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          email,
+          password: hashedPassword,
+          image: dto.image,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+
+      return {
+        user: newuser,
+        token: this.getJwtToken({ id: newuser.id }),
+      };
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+        this.logger.warn(`POST: auth/signup: User already exists: ${email}`);
+        throw new BadRequestException('User already exists');
+      }
+      this.logger.error(`POST: auth/signup: error: ${JSON.stringify(error)}`);
       throw new InternalServerErrorException('Server error');
     }
   }
