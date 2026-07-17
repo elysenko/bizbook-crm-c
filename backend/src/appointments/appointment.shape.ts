@@ -1,5 +1,5 @@
 // budget: 400 lines
-import { Prisma } from '@generated/prisma/client';
+import { Prisma } from '../generated/prisma/client';
 
 // Canonical include used for every appointment query so responses always
 // carry the related client + service needed for flattening.

@@ -1,8 +1,8 @@
 // budget: 400 lines
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Role } from '@generated/prisma/client';
-import { Auth } from 'src/auth/decorators';
+import { Role } from '../generated/prisma/client';
+import { Auth } from '../auth/decorators';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';

@@ -1,7 +1,7 @@
 // budget: 400 lines
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-import { AppointmentStatus } from '@generated/prisma/client';
+import { AppointmentStatus } from '../../generated/prisma/client';
 
 export class UpdateAppointmentStatusDto {
   @ApiProperty({

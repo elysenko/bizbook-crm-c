@@ -1,8 +1,8 @@
 // budget: 400 lines
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AppointmentStatus } from '@generated/prisma/client';
-import { monthRange, weekRange, DateRange } from 'src/common/date.util';
+import { PrismaService } from '../prisma/prisma.service';
+import { AppointmentStatus } from '../generated/prisma/client';
+import { monthRange, weekRange, DateRange } from '../common/date.util';
 
 @Injectable()
 export class RevenueService {

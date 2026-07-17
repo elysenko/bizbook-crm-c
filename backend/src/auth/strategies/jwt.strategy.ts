@@ -6,8 +6,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/user/entities/user.entity';
+import { PrismaService } from '../../prisma/prisma.service';
+import { User } from '../../user/entities/user.entity';
 import { EnvironmentVariables } from '@/common/config/env.config';
 
 @Injectable()

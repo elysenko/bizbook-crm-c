@@ -1,7 +1,7 @@
 // budget: 400 lines
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Auth } from 'src/auth/decorators';
+import { Auth } from '../auth/decorators';
 import { DashboardService } from './dashboard.service';
 
 @ApiTags('Dashboard')

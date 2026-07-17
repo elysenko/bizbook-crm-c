@@ -24,6 +24,7 @@ const SEED_USERS = [
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const creds = {};
   try {
     for (const u of SEED_USERS) {
       const plain  = derivePassword(u.email);
@@ -38,8 +39,12 @@ async function main() {
                "updatedAt" = now()`,
         [randomUUID(), u.name, u.email, hashed, u.role],
       );
+      // Platform post-deploy capture format (one line per credential).
       console.log(`SEED_CRED ${u.role} ${u.email} ${plain}`);
+      creds[u.role] = { email: u.email, password: plain, role: u.role };
     }
+    // Spec-required demo credential blob (single parseable JSON line).
+    console.log(`SEED_CREDS_JSON=${JSON.stringify(creds)}`);
   } finally {
     await pool.end();
   }

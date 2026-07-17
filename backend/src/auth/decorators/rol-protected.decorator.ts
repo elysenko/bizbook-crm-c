@@ -1,6 +1,6 @@
 // budget: 400 lines
 import { SetMetadata } from '@nestjs/common';
-import { Role } from '@generated/prisma/client';
+import { Role } from '../../generated/prisma/client';
 
 export const META_ROLES = 'role';
 

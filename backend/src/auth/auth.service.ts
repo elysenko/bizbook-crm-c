@@ -13,8 +13,8 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/user/entities/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '../user/entities/user.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 @Injectable()

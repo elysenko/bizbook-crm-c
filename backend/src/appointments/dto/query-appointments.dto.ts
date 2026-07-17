@@ -1,7 +1,7 @@
 // budget: 400 lines
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsUUID, Matches } from 'class-validator';
-import { AppointmentStatus } from '@generated/prisma/client';
+import { AppointmentStatus } from '../../generated/prisma/client';
 
 export class QueryAppointmentsDto {
   @ApiPropertyOptional({ enum: AppointmentStatus, description: 'Filter by status' })

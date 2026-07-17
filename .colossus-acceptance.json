@@ -1,5 +1,5 @@
 {
   "ready_testid": "app-ready",
-  "expect_text": [],
-  "reject_signatures": ["Welcome", "You are logged in.", "Loading..."]
+  "expect_text": ["bizbook", "sign in to manage your front desk"],
+  "reject_signatures": ["You are logged in.", "Lorem ipsum", "home-title\">Users<"]
 }

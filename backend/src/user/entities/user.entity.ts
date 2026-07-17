@@ -1,6 +1,6 @@
 // budget: 400 lines
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@generated/prisma/client';
+import { Role } from '../../generated/prisma/client';
 
 export class User {
   @ApiProperty({

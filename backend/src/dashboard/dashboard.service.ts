@@ -1,9 +1,9 @@
 // budget: 400 lines
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AppointmentStatus } from '@generated/prisma/client';
-import { dayRange } from 'src/common/date.util';
-import { appointmentInclude, shapeAppointment } from 'src/appointments/appointment.shape';
+import { PrismaService } from '../prisma/prisma.service';
+import { AppointmentStatus } from '../generated/prisma/client';
+import { dayRange } from '../common/date.util';
+import { appointmentInclude, shapeAppointment } from '../appointments/appointment.shape';
 
 @Injectable()
 export class DashboardService {

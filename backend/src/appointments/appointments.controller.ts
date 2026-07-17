@@ -1,8 +1,8 @@
 // budget: 400 lines
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Auth, GetUser } from 'src/auth/decorators';
-import { User } from 'src/user/entities/user.entity';
+import { Auth, GetUser } from '../auth/decorators';
+import { User } from '../user/entities/user.entity';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';

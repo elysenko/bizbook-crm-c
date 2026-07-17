@@ -1,8 +1,8 @@
 // budget: 400 lines
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Role } from '@generated/prisma/client';
-import { Auth } from 'src/auth/decorators';
+import { Role } from '../generated/prisma/client';
+import { Auth } from '../auth/decorators';
 import { RevenueService } from './revenue.service';
 
 @ApiTags('Revenue')

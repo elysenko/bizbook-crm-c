@@ -9,7 +9,7 @@ import { Auth, GetUser } from './decorators';
 
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')

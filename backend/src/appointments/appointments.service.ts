@@ -6,10 +6,10 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AppointmentStatus, Prisma } from '@generated/prisma/client';
-import { User } from 'src/user/entities/user.entity';
-import { dayRangeFromString } from 'src/common/date.util';
+import { PrismaService } from '../prisma/prisma.service';
+import { AppointmentStatus, Prisma } from '../generated/prisma/client';
+import { User } from '../user/entities/user.entity';
+import { dayRangeFromString } from '../common/date.util';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { QueryAppointmentsDto } from './dto/query-appointments.dto';
 import { appointmentInclude, shapeAppointment } from './appointment.shape';

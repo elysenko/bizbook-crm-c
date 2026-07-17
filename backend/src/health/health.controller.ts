@@ -1,8 +1,8 @@
 // budget: 400 lines
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
-import { Public } from 'src/auth/decorators';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Public } from '../auth/decorators';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('health')
 export class HealthController {
