@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: colossus-bizbook-crm-c
+resources:
+  - k8s/deployment.yaml
+  - k8s/service.yaml
+  - k8s/ingress.yaml
+images:
+  - name: ubuntu:30500/bizbook-crm-c
+    digest: sha256:26dcf134de7afb7621acfd302783c195e67c9fee012eba172f0f131b4de51ff2
+# Redeploy:  kubectl apply -k . (re-applies this exact image)
+# Rebuild:   re-trigger the deploy pipeline for branch main in Colossus
