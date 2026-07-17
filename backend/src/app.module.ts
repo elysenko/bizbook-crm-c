@@ -13,6 +13,7 @@ import { ServicesModule } from './services/services.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { RevenueModule } from './revenue/revenue.module';
+import { AdminSettingsModule } from './admin-settings/admin-settings.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -39,6 +40,7 @@ import { APP_GUARD } from '@nestjs/core';
     AppointmentsModule,
     DashboardModule,
     RevenueModule,
+    AdminSettingsModule,
   ],
   controllers: [AppController],
   providers: [

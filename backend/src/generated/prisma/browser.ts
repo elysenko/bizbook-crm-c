@@ -33,6 +33,11 @@ export type Client = Prisma.ClientModel
  */
 export type Service = Prisma.ServiceModel
 /**
+ * Model AppSetting
+ * 
+ */
+export type AppSetting = Prisma.AppSettingModel
+/**
  * Model Appointment
  * 
  */

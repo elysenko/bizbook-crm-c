@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Client: 'Client',
   Service: 'Service',
+  AppSetting: 'AppSetting',
   Appointment: 'Appointment'
 } as const
 
@@ -111,6 +112,15 @@ export const ServiceScalarFieldEnum = {
 } as const
 
 export type ServiceScalarFieldEnum = (typeof ServiceScalarFieldEnum)[keyof typeof ServiceScalarFieldEnum]
+
+
+export const AppSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppSettingScalarFieldEnum = (typeof AppSettingScalarFieldEnum)[keyof typeof AppSettingScalarFieldEnum]
 
 
 export const AppointmentScalarFieldEnum = {

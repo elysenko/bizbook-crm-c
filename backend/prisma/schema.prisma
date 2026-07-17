@@ -64,6 +64,12 @@ model Service {
   appointments    Appointment[]
 }
 
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 model Appointment {
   id          String            @id @default(uuid())
   startTime   DateTime
