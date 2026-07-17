@@ -20,6 +20,12 @@ enum Role {
   user
 }
 
+enum AppointmentStatus {
+  booked
+  completed
+  cancelled
+}
+
 
 model User {
   id            String    @id @default(uuid())
@@ -32,5 +38,49 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   //Relations and Indexes
- 
+  appointments  Appointment[] @relation("AppointmentCreatedBy")
+}
+
+model Client {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String
+  email        String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  // Relations
+  appointments Appointment[]
+}
+
+model Service {
+  id              String        @id @default(uuid())
+  name            String
+  durationMinutes Int
+  price           Float
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  // Relations
+  appointments    Appointment[]
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  startTime   DateTime
+  status      AppointmentStatus @default(booked)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  // Relations
+  clientId    String
+  client      Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  serviceId   String
+  service     Service           @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User              @relation("AppointmentCreatedBy", fields: [createdById], references: [id])
+
+  @@index([clientId])
+  @@index([serviceId])
+  @@index([createdById])
+  @@index([startTime])
+  @@index([status])
 }

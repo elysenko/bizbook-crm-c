@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Settings</h1>
+      <p class="page-sub">Configure backing-service credentials.</p>
+    </div>
+  </div>
+
+  @if (unconfigured().length > 0) {
+    <div class="alert alert-warn">
+      ⚠️ The following need credentials to activate:
+      @for (s of unconfigured(); track s.key; let last = $last) {
+        <strong>{{ s.label }}</strong><span>{{ last ? '' : ', ' }}</span>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="card state"><div class="state-icon">⏳</div><div>Loading settings…</div></div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else {
+    <div class="settings-list">
+      @for (setting of settings(); track setting.key) {
+        <div class="card service-card">
+          <div class="service-head">
+            <div>
+              <h2 class="service-title">{{ setting.label }}</h2>
+              <code class="service-key">{{ setting.key }}</code>
+            </div>
+            <span class="badge" [class.badge-completed]="setting.configured" [class.badge-cancelled]="!setting.configured">
+              {{ setting.configured ? 'Configured' : 'Not configured' }}
+            </span>
+          </div>
+
+          <form (ngSubmit)="save(setting.key)">
+            @for (f of setting.fields; track f.key) {
+              <div class="field">
+                <label [attr.for]="f.key">{{ f.label }}</label>
+                <input [id]="f.key" type="text" [placeholder]="f.placeholder"
+                       [(ngModel)]="values[f.key]" [name]="f.key" autocomplete="off" />
+              </div>
+            }
+            <div class="service-actions">
+              @if (savedKey() === setting.key) {
+                <span class="saved-note">✓ Saved</span>
+              }
+              <button class="btn btn-primary" type="submit">Save credentials</button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  }
+</div>

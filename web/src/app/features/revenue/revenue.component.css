@@ -1,0 +1,4 @@
+.section-title {
+  font-size: var(--fs-lg);
+  margin: var(--space-6) 0 var(--space-4);
+}

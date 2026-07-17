@@ -1,0 +1,116 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Appointments</h1>
+      <p class="page-sub">Book, complete, and track appointments.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openBook()">+ Book appointment</button>
+  </div>
+
+  <div class="filters">
+    <div class="chips">
+      @for (status of statusFilters; track status) {
+        <button class="chip" [class.active]="activeStatus() === status" type="button" (click)="setStatus(status)">
+          {{ status === 'all' ? 'All' : status }}
+        </button>
+      }
+    </div>
+    <div class="date-filter">
+      <input type="date" [value]="dateFilter()" (change)="onDateChange($any($event.target).value)" aria-label="Filter by date" />
+      @if (dateFilter()) {
+        <button class="btn btn-ghost btn-sm" type="button" (click)="onDateChange('')">Clear</button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="card state"><div class="state-icon">⏳</div><div>Loading appointments…</div></div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (filtered().length === 0) {
+    <div class="card state">
+      <div class="state-icon">🗓️</div>
+      <div class="state-title">No appointments match</div>
+      <div>Try a different filter or book a new appointment.</div>
+    </div>
+  } @else {
+    <div class="card table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>When</th><th>Client</th><th>Service</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (appt of filtered(); track appt.id) {
+            <tr>
+              <td>{{ when(appt.startTime) }}</td>
+              <td><strong>{{ appt.clientName }}</strong></td>
+              <td>{{ appt.serviceName }}</td>
+              <td>
+                <span class="badge"
+                      [class.badge-booked]="appt.status === 'booked'"
+                      [class.badge-completed]="appt.status === 'completed'"
+                      [class.badge-cancelled]="appt.status === 'cancelled'">
+                  {{ appt.status }}
+                </span>
+              </td>
+              <td>
+                <div class="cell-actions">
+                  @if (appt.status === 'booked') {
+                    @if (auth.isAdmin()) {
+                      <button class="btn btn-secondary btn-sm" type="button" (click)="setStatusOf(appt.id, 'completed')">Complete</button>
+                    }
+                    <button class="btn btn-danger btn-sm" type="button" (click)="setStatusOf(appt.id, 'cancelled')">Cancel</button>
+                  } @else {
+                    <span class="muted text-sm">—</span>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (bookOpen()) {
+  <app-modal title="Book appointment" (close)="closeBook()">
+    <form [formGroup]="form" (ngSubmit)="book()" novalidate>
+      <div class="field">
+        <label for="clientId">Client</label>
+        <select id="clientId" formControlName="clientId">
+          <option value="" disabled>Select a client</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.name }}</option>
+          }
+        </select>
+        @if (form.get('clientId')?.invalid && form.get('clientId')?.touched) {
+          <div class="error-text">Choose a client.</div>
+        }
+      </div>
+      <div class="field">
+        <label for="serviceId">Service</label>
+        <select id="serviceId" formControlName="serviceId">
+          <option value="" disabled>Select a service</option>
+          @for (svc of services(); track svc.id) {
+            <option [value]="svc.id">{{ svc.name }} — {{ svc.price | currency }}</option>
+          }
+        </select>
+        @if (form.get('serviceId')?.invalid && form.get('serviceId')?.touched) {
+          <div class="error-text">Choose a service.</div>
+        }
+      </div>
+      <div class="field">
+        <label for="startTime">Date & time</label>
+        <input id="startTime" type="datetime-local" formControlName="startTime" />
+        @if (form.get('startTime')?.invalid && form.get('startTime')?.touched) {
+          <div class="error-text">Pick a date and time.</div>
+        }
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" (click)="closeBook()">Cancel</button>
+        <button class="btn btn-primary" type="submit">Book</button>
+      </div>
+    </form>
+  </app-modal>
+}

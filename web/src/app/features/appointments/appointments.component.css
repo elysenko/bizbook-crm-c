@@ -1,0 +1,15 @@
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+.date-filter { display: flex; align-items: center; gap: var(--space-2); }
+.date-filter input { width: auto; min-width: 150px; }
+
+@media (max-width: 768px) {
+  .filters { flex-direction: column; align-items: stretch; }
+  .date-filter input { flex: 1; }
+}

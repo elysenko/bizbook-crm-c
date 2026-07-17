@@ -1,0 +1,44 @@
+<div class="auth-page">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <span class="brand-mark">B</span>
+      <span class="brand-name">BizBook</span>
+    </div>
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub muted">Sign in to manage your front desk.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="you@business.com" autocomplete="email" />
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <div class="error-text">Enter a valid email address.</div>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <div class="error-text">Password is required.</div>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert-error">{{ errorMessage }}</div>
+      }
+
+      <button class="btn btn-primary btn-block" type="submit" [disabled]="loading">
+        {{ loading ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <button class="btn btn-ghost btn-block demo-btn" type="button" (click)="demoMode()">
+      Skip login — Demo Mode
+    </button>
+
+    <p class="auth-alt muted">
+      New here? <a routerLink="/signup" class="link">Create an account</a>
+    </p>
+  </div>
+</div>

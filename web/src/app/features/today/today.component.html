@@ -1,0 +1,44 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Front Desk — Today</h1>
+      <p class="page-sub">Your appointments for the day, in time order.</p>
+    </div>
+    <a routerLink="/appointments" [queryParams]="{ modal: 'book' }" class="btn btn-primary">+ Book appointment</a>
+  </div>
+
+  <div class="summary-row">
+    <span class="badge badge-booked remaining">{{ remainingCount() }} remaining today</span>
+    <span class="muted text-sm">{{ appointments().length }} total scheduled</span>
+  </div>
+
+  @if (loading()) {
+    <div class="card state"><div class="state-icon">⏳</div><div>Loading today's schedule…</div></div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (sorted().length === 0) {
+    <div class="card state">
+      <div class="state-icon">🗓️</div>
+      <div class="state-title">No appointments today</div>
+      <div>Book the first one to get started.</div>
+    </div>
+  } @else {
+    <div class="card timeline">
+      @for (appt of sorted(); track appt.id) {
+        <div class="slot">
+          <div class="slot-time">{{ time(appt.startTime) }}</div>
+          <div class="slot-body">
+            <div class="slot-client">{{ appt.clientName }}</div>
+            <div class="slot-service muted">{{ appt.serviceName }}</div>
+          </div>
+          <span class="badge"
+                [class.badge-booked]="appt.status === 'booked'"
+                [class.badge-completed]="appt.status === 'completed'"
+                [class.badge-cancelled]="appt.status === 'cancelled'">
+            {{ appt.status }}
+          </span>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,37 +1,68 @@
 // budget: 400 lines
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { FlowRoute } from './flow-meta';
 
 // `data.flow` is the single source of truth for the user-flow graph AND the runtime navbar.
-// The colossus flow-graph extractor projects it directly (zero heuristics). Authoring rules
-// + lint: docs/flow-graph-convention.md + platform/flowgraph-static/verify/flow-lint.mjs.
-//
-// DEEP-LINKABLE STATE — every navigable UI state a user could leave feedback on must be
-// reachable by URL (so automated verification can land on it). Patterns:
-//   • wizard / multi-step → child routes, or a `?step=` query param the component restores from:
-//       { path: 'onboarding', loadComponent: …, data: { flow: { flowId:'onboarding', node:'onboarding' } }, children: [
-//         { path: 'profile', …, data: { flow: { flowId:'onboarding-profile', node:'onboarding-profile' } } },
-//         { path: 'connect', …, data: { flow: { flowId:'onboarding-connect', node:'onboarding-connect' } } },
-//       ]}
-//   • tabs / sub-tabs → child routes (preferred) or `?tab=`
-//   • modal / dialog → `?modal=<name>[&id=]` read on init (or a modal child route)
-//   • drawer / detail pane → `?panel=<name>&id=` or `/:id`
-//   • filtered / sorted list → bind the filter to query params (queryParamsHandling:'merge')
-// Never bury a navigable state in component-only state. Transient chrome (tooltip/hover) is exempt.
+// DEEP-LINKABLE STATE — every navigable UI state is reachable by URL:
+//   • modal / dialog → `?modal=<name>[&id=]` read on init
+//   • filtered list  → filters bound to query params (`?status=`, `?date=`)
 export const routes: Routes = ([
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'today', pathMatch: 'full' },
   {
     path: 'login',
     loadComponent: () =>
       import('./features/login/login.component').then((m) => m.LoginComponent),
-    data: { flow: { flowId: 'login', node: 'login', entry: true, edgesTo: ['home'], label: 'Login' } },
+    data: { flow: { flowId: 'login', node: 'login', entry: true, edgesTo: ['today', 'signup'], label: 'Login' } },
   },
   {
-    path: 'home',
+    path: 'signup',
     loadComponent: () =>
-      import('./features/home/home.component').then((m) => m.HomeComponent),
-    canActivate: [authGuard],
-    data: { flow: { flowId: 'home', node: 'home', showInNavbar: true, label: 'Home', scope: 'all' } },
+      import('./features/signup/signup.component').then((m) => m.SignupComponent),
+    data: { flow: { flowId: 'signup', node: 'signup', edgesTo: ['today', 'login'], label: 'Sign up' } },
   },
+  {
+    path: 'today',
+    loadComponent: () =>
+      import('./features/today/today.component').then((m) => m.TodayComponent),
+    canActivate: [authGuard],
+    data: { flow: { flowId: 'today', node: 'today', showInNavbar: true, label: 'Today', scope: 'all' } },
+  },
+  {
+    path: 'appointments',
+    loadComponent: () =>
+      import('./features/appointments/appointments.component').then((m) => m.AppointmentsComponent),
+    canActivate: [authGuard],
+    data: { flow: { flowId: 'appointments', node: 'appointments', showInNavbar: true, label: 'Appointments', scope: 'all' } },
+  },
+  {
+    path: 'clients',
+    loadComponent: () =>
+      import('./features/clients/clients.component').then((m) => m.ClientsComponent),
+    canActivate: [adminGuard],
+    data: { flow: { flowId: 'clients', node: 'clients', showInNavbar: true, label: 'Clients', scope: 'admin' } },
+  },
+  {
+    path: 'services',
+    loadComponent: () =>
+      import('./features/services/services.component').then((m) => m.ServicesComponent),
+    canActivate: [adminGuard],
+    data: { flow: { flowId: 'services', node: 'services', showInNavbar: true, label: 'Services', scope: 'admin' } },
+  },
+  {
+    path: 'revenue',
+    loadComponent: () =>
+      import('./features/revenue/revenue.component').then((m) => m.RevenueComponent),
+    canActivate: [adminGuard],
+    data: { flow: { flowId: 'revenue', node: 'revenue', showInNavbar: true, label: 'Revenue', scope: 'admin' } },
+  },
+  {
+    path: 'admin/settings',
+    loadComponent: () =>
+      import('./features/admin-settings/admin-settings.component').then((m) => m.AdminSettingsComponent),
+    canActivate: [adminGuard],
+    data: { flow: { flowId: 'admin-settings', node: 'admin-settings', showInNavbar: true, label: 'Settings', scope: 'admin' } },
+  },
+  { path: '**', redirectTo: 'today' },
 ] satisfies FlowRoute[]) as Routes;

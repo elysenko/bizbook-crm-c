@@ -1,0 +1,75 @@
+@if (showChrome()) {
+  <div class="shell">
+    <!-- Desktop sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <span class="brand-name">BizBook</span>
+      </div>
+      <nav class="nav">
+        @for (item of navItems(); track item.path) {
+          <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar">{{ (auth.user()?.name || '?').charAt(0) }}</div>
+          <div class="user-meta">
+            <span class="user-name">{{ auth.user()?.name }}</span>
+            <span class="badge badge-neutral">{{ auth.role() }}</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-block" type="button" (click)="logout()">Log out</button>
+      </div>
+    </aside>
+
+    <!-- Mobile top bar -->
+    <header class="topbar">
+      <button class="hamburger" type="button" (click)="toggleDrawer()" aria-label="Menu">☰</button>
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <span class="brand-name">BizBook</span>
+      </div>
+      <div class="avatar sm">{{ (auth.user()?.name || '?').charAt(0) }}</div>
+    </header>
+
+    <!-- Mobile drawer -->
+    @if (drawerOpen()) {
+      <div class="drawer-backdrop" (click)="toggleDrawer()"></div>
+      <div class="drawer">
+        <div class="brand drawer-brand">
+          <span class="brand-mark">B</span>
+          <span class="brand-name">BizBook</span>
+        </div>
+        <nav class="nav">
+          @for (item of navItems(); track item.path) {
+            <a class="nav-item" [routerLink]="item.path" routerLinkActive="active">
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </nav>
+        <button class="btn btn-ghost btn-block" type="button" (click)="logout()">Log out</button>
+      </div>
+    }
+
+    <main class="content">
+      <router-outlet />
+    </main>
+
+    <!-- Mobile bottom tab bar -->
+    <nav class="tabbar">
+      @for (item of tabItems(); track item.path) {
+        <a class="tab-item" [routerLink]="item.path" routerLinkActive="active">
+          <span class="tab-icon">{{ item.icon }}</span>
+          <span class="tab-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+} @else {
+  <router-outlet />
+}

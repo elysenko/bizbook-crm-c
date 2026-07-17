@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Services</h1>
+      <p class="page-sub">The treatments and their pricing.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="goNew()">+ New service</button>
+  </div>
+
+  @if (loading()) {
+    <div class="card state"><div class="state-icon">⏳</div><div>Loading services…</div></div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (services().length === 0) {
+    <div class="card state">
+      <div class="state-icon">✂️</div>
+      <div class="state-title">No services yet</div>
+      <div>Add a service so appointments can be booked.</div>
+    </div>
+  } @else {
+    <div class="card table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Service</th><th>Duration</th><th>Price</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (svc of services(); track svc.id) {
+            <tr>
+              <td><strong>{{ svc.name }}</strong></td>
+              <td>{{ svc.durationMinutes }} min</td>
+              <td>{{ svc.price | currency }}</td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn btn-secondary btn-sm" type="button" (click)="goEdit(svc.id)">Edit</button>
+                  <button class="btn btn-danger btn-sm" type="button" (click)="remove(svc.id)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (modal()) {
+  <app-modal [title]="modal() === 'edit' ? 'Edit service' : 'New service'" (close)="close()">
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="field">
+        <label for="name">Service name</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Haircut & Style" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <div class="error-text">Name is required.</div>
+        }
+      </div>
+      <div class="field">
+        <label for="durationMinutes">Duration (minutes)</label>
+        <input id="durationMinutes" type="number" min="1" formControlName="durationMinutes" />
+        @if (form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched) {
+          <div class="error-text">Enter a duration of at least 1 minute.</div>
+        }
+      </div>
+      <div class="field">
+        <label for="price">Price ($)</label>
+        <input id="price" type="number" min="0" step="0.01" formControlName="price" />
+        @if (form.get('price')?.invalid && form.get('price')?.touched) {
+          <div class="error-text">Enter a valid price.</div>
+        }
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save service</button>
+      </div>
+    </form>
+  </app-modal>
+}

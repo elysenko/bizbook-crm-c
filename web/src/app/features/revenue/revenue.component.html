@@ -1,0 +1,54 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Revenue</h1>
+      <p class="page-sub">Completed appointment revenue for the current week and month.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="card state"><div class="state-icon">⏳</div><div>Loading revenue…</div></div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else {
+    <div class="stat-grid">
+      <div class="card stat">
+        <div class="stat-label">This week</div>
+        <div class="stat-value">{{ summary()?.week | currency }}</div>
+        <div class="muted text-sm">Mon–Sun, completed only</div>
+      </div>
+      <div class="card stat">
+        <div class="stat-label">This month</div>
+        <div class="stat-value">{{ summary()?.month | currency }}</div>
+        <div class="muted text-sm">Calendar month, completed only</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Completed appointments</h2>
+    @if (completed().length === 0) {
+      <div class="card state">
+        <div class="state-icon">💰</div>
+        <div class="state-title">No completed appointments yet</div>
+        <div>Revenue appears here once appointments are completed.</div>
+      </div>
+    } @else {
+      <div class="card table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Date</th><th>Client</th><th>Service</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            @for (appt of completed(); track appt.id) {
+              <tr>
+                <td>{{ date(appt.startTime) }}</td>
+                <td>{{ appt.clientName }}</td>
+                <td>{{ appt.serviceName }}</td>
+                <td><strong>{{ appt.price | currency }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
