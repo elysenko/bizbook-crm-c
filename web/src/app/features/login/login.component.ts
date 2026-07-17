@@ -22,7 +22,7 @@ export class LoginComponent {
     private authService: AuthService,
   ) {
     this.loginForm = this.fb.group({
-      email: ['admin@bizbook.test', [Validators.required, Validators.email]],
+      email: ['admin@example.com', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }
@@ -35,7 +35,15 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
     const { email, password } = this.loginForm.value;
-    this.authService.login(email, password);
+    this.authService.login(email, password).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err?.error?.message || 'Invalid email or password.';
+      },
+    });
   }
 
   demoMode(): void {

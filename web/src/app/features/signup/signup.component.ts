@@ -46,6 +46,14 @@ export class SignupComponent {
     this.loading = true;
     this.errorMessage = '';
     const { name, email, password } = this.signupForm.value;
-    this.authService.signup(name, email, password);
+    this.authService.signup(name, email, password).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err?.error?.message || 'Could not create account.';
+      },
+    });
   }
 }

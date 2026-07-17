@@ -1,11 +1,12 @@
 // budget: 400 lines
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { Service } from '../../core/models';
+import { ServicesApi } from '../../core/services/services-api.service';
 
 @Component({
   selector: 'app-services',
@@ -14,18 +15,14 @@ import { Service } from '../../core/models';
   templateUrl: './services.component.html',
   styleUrl: './services.component.css',
 })
-export class ServicesComponent {
+export class ServicesComponent implements OnInit {
+  private readonly servicesApi = inject(ServicesApi);
+
   loading = signal(false);
   error = signal<string | null>(null);
 
-  // Mock data — cleared by mockup_cleaner, wired to GET /api/services.
-  services = signal<Service[]>([
-    { id: 's1', name: 'Haircut & Style', durationMinutes: 45, price: 45 },
-    { id: 's2', name: 'Beard Trim', durationMinutes: 20, price: 20 },
-    { id: 's3', name: 'Color & Highlights', durationMinutes: 120, price: 120 },
-    { id: 's4', name: 'Manicure', durationMinutes: 40, price: 35 },
-    { id: 's5', name: 'Deep Conditioning', durationMinutes: 30, price: 28 },
-  ]);
+  // Live data from GET /api/v1/services.
+  services = signal<Service[]>([]);
 
   modal = signal<'new' | 'edit' | null>(null);
   editingId = signal<string | null>(null);
@@ -63,6 +60,24 @@ export class ServicesComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.load();
+  }
+
+  private load(): void {
+    this.loading.set(true);
+    this.servicesApi.list().subscribe({
+      next: (list) => {
+        this.services.set(list);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'Failed to load services.');
+        this.loading.set(false);
+      },
+    });
+  }
+
   goNew(): void {
     this.router.navigate([], { queryParams: { modal: 'new' } });
   }
@@ -81,17 +96,24 @@ export class ServicesComponent {
       return;
     }
     const value = this.form.value as Omit<Service, 'id'>;
-    if (this.modal() === 'edit' && this.editingId()) {
-      const id = this.editingId();
-      this.services.update((list) => list.map((s) => (s.id === id ? { ...s, ...value } : s)));
-    } else {
-      const id = 's-' + (this.services().length + 1);
-      this.services.update((list) => [...list, { id, ...value }]);
-    }
-    this.close();
+    const editId = this.modal() === 'edit' ? this.editingId() : null;
+    const request$ = editId
+      ? this.servicesApi.update(editId, value)
+      : this.servicesApi.create(value);
+
+    request$.subscribe({
+      next: () => {
+        this.load();
+        this.close();
+      },
+      error: (err) => this.error.set(err?.error?.message || 'Failed to save service.'),
+    });
   }
 
   remove(id: string): void {
-    this.services.update((list) => list.filter((s) => s.id !== id));
+    this.servicesApi.remove(id).subscribe({
+      next: () => this.services.update((list) => list.filter((s) => s.id !== id)),
+      error: (err) => this.error.set(err?.error?.message || 'Failed to delete service.'),
+    });
   }
 }

@@ -1,8 +1,9 @@
 // budget: 400 lines
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Appointment } from '../../core/models';
+import { DashboardApi } from '../../core/services/dashboard-api.service';
 
 @Component({
   selector: 'app-today',
@@ -11,26 +12,36 @@ import { Appointment } from '../../core/models';
   templateUrl: './today.component.html',
   styleUrl: './today.component.css',
 })
-export class TodayComponent {
+export class TodayComponent implements OnInit {
+  private readonly dashboardApi = inject(DashboardApi);
+
   loading = signal(false);
   error = signal<string | null>(null);
 
-  // Mock data — cleared by mockup_cleaner, wired to GET /api/dashboard/today.
-  appointments = signal<Appointment[]>([
-    { id: 'a1', clientId: 'c1', serviceId: 's1', clientName: 'Maya Chen', serviceName: 'Haircut & Style', startTime: '2026-07-17T09:30:00', status: 'completed', price: 45 },
-    { id: 'a2', clientId: 'c2', serviceId: 's2', clientName: 'David Okafor', serviceName: 'Beard Trim', startTime: '2026-07-17T10:15:00', status: 'completed', price: 20 },
-    { id: 'a3', clientId: 'c3', serviceId: 's3', clientName: 'Priya Nair', serviceName: 'Color & Highlights', startTime: '2026-07-17T13:00:00', status: 'booked', price: 120 },
-    { id: 'a4', clientId: 'c4', serviceId: 's1', clientName: 'Tom Alvarez', serviceName: 'Haircut & Style', startTime: '2026-07-17T15:30:00', status: 'booked', price: 45 },
-    { id: 'a5', clientId: 'c5', serviceId: 's4', clientName: 'Sara Lindqvist', serviceName: 'Manicure', startTime: '2026-07-17T16:45:00', status: 'booked', price: 35 },
-  ]);
+  // Live data from GET /api/v1/dashboard/today.
+  appointments = signal<Appointment[]>([]);
+  private _remaining = signal(0);
 
   readonly sorted = computed(() =>
     [...this.appointments()].sort((a, b) => a.startTime.localeCompare(b.startTime)),
   );
 
-  readonly remainingCount = computed(
-    () => this.appointments().filter((a) => a.status === 'booked').length,
-  );
+  readonly remainingCount = computed(() => this._remaining());
+
+  ngOnInit(): void {
+    this.loading.set(true);
+    this.dashboardApi.today().subscribe({
+      next: (res) => {
+        this.appointments.set(res.appointments);
+        this._remaining.set(res.remainingCount);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'Failed to load today’s schedule.');
+        this.loading.set(false);
+      },
+    });
+  }
 
   time(iso: string): string {
     const d = new Date(iso);

@@ -1,11 +1,12 @@
 // budget: 400 lines
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { Client } from '../../core/models';
+import { ClientsApi } from '../../core/services/clients-api.service';
 
 @Component({
   selector: 'app-clients',
@@ -14,18 +15,14 @@ import { Client } from '../../core/models';
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.css',
 })
-export class ClientsComponent {
+export class ClientsComponent implements OnInit {
+  private readonly clientsApi = inject(ClientsApi);
+
   loading = signal(false);
   error = signal<string | null>(null);
 
-  // Mock data — cleared by mockup_cleaner, wired to GET /api/clients.
-  clients = signal<Client[]>([
-    { id: 'c1', name: 'Maya Chen', phone: '(415) 555-0142', email: 'maya@example.com', notes: 'Prefers morning slots' },
-    { id: 'c2', name: 'David Okafor', phone: '(415) 555-0177', email: 'david.o@example.com', notes: '' },
-    { id: 'c3', name: 'Priya Nair', phone: '(628) 555-0199', email: 'priya.nair@example.com', notes: 'Allergic to almond oil' },
-    { id: 'c4', name: 'Tom Alvarez', phone: '(510) 555-0163', email: '', notes: '' },
-    { id: 'c5', name: 'Sara Lindqvist', phone: '(415) 555-0110', email: 'sara.l@example.com', notes: 'VIP' },
-  ]);
+  // Live data from GET /api/v1/clients.
+  clients = signal<Client[]>([]);
 
   modal = signal<'new' | 'edit' | null>(null);
   editingId = signal<string | null>(null);
@@ -59,6 +56,24 @@ export class ClientsComponent {
         this.modal.set(null);
         this.editingId.set(null);
       }
+    });
+  }
+
+  ngOnInit(): void {
+    this.load();
+  }
+
+  private load(): void {
+    this.loading.set(true);
+    this.clientsApi.list().subscribe({
+      next: (list) => {
+        this.clients.set(list);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message || 'Failed to load clients.');
+        this.loading.set(false);
+      },
     });
   }
 
@@ -99,17 +114,24 @@ export class ClientsComponent {
       return;
     }
     const value = this.form.value as Omit<Client, 'id'>;
-    if (this.modal() === 'edit' && this.editingId()) {
-      const id = this.editingId();
-      this.clients.update((list) => list.map((c) => (c.id === id ? { ...c, ...value } : c)));
-    } else {
-      const id = 'c-' + (this.clients().length + 1);
-      this.clients.update((list) => [...list, { id, ...value }]);
-    }
-    this.close();
+    const editId = this.modal() === 'edit' ? this.editingId() : null;
+    const request$ = editId
+      ? this.clientsApi.update(editId, value)
+      : this.clientsApi.create(value);
+
+    request$.subscribe({
+      next: () => {
+        this.load();
+        this.close();
+      },
+      error: (err) => this.error.set(err?.error?.message || 'Failed to save client.'),
+    });
   }
 
   remove(id: string): void {
-    this.clients.update((list) => list.filter((c) => c.id !== id));
+    this.clientsApi.remove(id).subscribe({
+      next: () => this.clients.update((list) => list.filter((c) => c.id !== id)),
+      error: (err) => this.error.set(err?.error?.message || 'Failed to delete client.'),
+    });
   }
 }
